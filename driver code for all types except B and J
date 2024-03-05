@@ -1,7 +1,7 @@
-def twoscompliment(x):
+def twoscompliment(x , n):
     num = int(x)
-
-    if num > 2047 or num < -2048:
+    
+    if (num > ((2**(n-1)) - 1) or num < -(2**(n-1))):
         print("error")
     
     else:
@@ -11,45 +11,18 @@ def twoscompliment(x):
             while tempnum != 0:
                 a = str(tempnum % 2) + a
                 tempnum = tempnum // 2
-            a = (12 - len(a))*"0" + a 
-            return a
-
-        if num < 0:
-            a = ""
-            tempnum = (num*(-1)) - 1
-            while tempnum != 0:
-                a = str(tempnum % 2) + a
-                tempnum = tempnum // 2
-            a = str(111111111111 - int(a))
-            a = (12 - len(a))*"0" + a
+            a = (n - len(a))*"0" + a 
             return a
         
-def twoscompliment32bit(x):
-    num = int(x)
-
-    if num > 2147483647 or num < -2147483648:
-        print("error")
-    
-    else:
-        if num >= 0:
-            a = ""
-            tempnum = num
-            while tempnum != 0:
-                a = str(tempnum % 2) + a
-                tempnum = tempnum // 2
-            a = (32 - len(a))*"0" + a 
-            return a
-
-        if num < 0:
+        else:
             a = ""
             tempnum = (num*(-1)) - 1
             while tempnum != 0:
                 a = str(tempnum % 2) + a
                 tempnum = tempnum // 2
-            a = str(11111111111111111111111111111111 - int(a))
-            a = (32 - len(a))*"0" + a
-            return a
-
+            a = str(int(n*"1") - int(a))
+            a = (n - len(a))*"0" + a
+            return a            
 
 def code_for_a_single_line(x):
     instruction_type = { "R":["add" , "sub" , "sll" , "slt" , "sltu" , "xor" , "srl" , "or" , "and"] ,
@@ -144,7 +117,7 @@ def code_for_a_single_line(x):
         else:
             funct3 = "000"        
         
-        immediate = twoscompliment(t[2])
+        immediate = twoscompliment(t[2] , 12)
         
         a = immediate + " " + registers[t[1]] + " " + funct3 + " " + registers[t[0]] + " " + opcode
         #print(a)
@@ -154,13 +127,13 @@ def code_for_a_single_line(x):
         t = x.split(" ")[1].split(",")
         opcode = "0100011"
         funct3 = "010"
-        immediate = twoscompliment(t[2])
+        immediate = twoscompliment(t[2] , 12)
         a = immediate[:7] + " " + registers[t[0]] + " " + registers[t[1]] + " " + funct3 + " " + immediate[-5:] + " " + opcode
         #print(a)
         return a
         
     if c == "B":
-        '''t = x.split(" ")[1].split(",")
+        t = x.split(" ")[1].split(",")
         opcode = "1100011"
         funct3_dict = {
             "beq" : "000",
@@ -171,11 +144,10 @@ def code_for_a_single_line(x):
             "bgeu" : "111"
         }
         funct3 = funct3_dict[y]
-        immediate = twoscompliment(t[2])
-        immediate = "abcdefghijklm"
+        immediate = twoscompliment(t[2] , 13)
         a = immediate[0] + immediate[2:8] + " " + registers[t[1]] + " " + registers[t[0]] + " " + funct3 + " " + immediate[8:12] + immediate[1] + " " + opcode
-        print(a)'''
-        pass
+        #print(a)
+        return a
         
     if c == "U":
         t = x.split(" ")[1].split(",")
@@ -183,13 +155,18 @@ def code_for_a_single_line(x):
             opcode = "0110111"
         else:
             opcode = "0010111"
-        immediate = twoscompliment32bit(t[1])
-        immediate = "11111111111111111111111111100010"        
+        immediate = twoscompliment(t[1] , 32)   
         a = immediate[:20] + " " + registers[t[0]] + " " + opcode
+        #return a
         print(a)
         
     if c == "J":
-        """opcode = "0010111"
-        immediate = """
-        pass
+        t = x.split(" ")[1].split(",")
+        opcode = "0010111"
+        immediate = twoscompliment(t[1] , 21)
+        b = immediate[0] + immediate[10:20] + immediate[9] + immediate[1:9]
+        a = b + " " + registers[t[0]] + " " + opcode
+        #return a
+        print(a)
+    
         
