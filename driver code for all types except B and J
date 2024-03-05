@@ -157,8 +157,8 @@ def code_for_a_single_line(x):
             opcode = "0010111"
         immediate = twoscompliment(t[1] , 32)   
         a = immediate[:20] + " " + registers[t[0]] + " " + opcode
-        #return a
-        print(a)
+        return a
+        #print(a)
         
     if c == "J":
         t = x.split(" ")[1].split(",")
@@ -166,7 +166,7 @@ def code_for_a_single_line(x):
         immediate = twoscompliment(t[1] , 21)
         b = immediate[0] + immediate[10:20] + immediate[9] + immediate[1:9]
         a = b + " " + registers[t[0]] + " " + opcode
-        #return a
-        print(a)
+        return a
+        #print(a)
     
         
