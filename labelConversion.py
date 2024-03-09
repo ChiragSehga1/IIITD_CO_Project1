@@ -41,14 +41,20 @@ def labelConvert():
     for i in range(1,numberOfLines+1):
         start=numberedCode[i].find(':')+1
         if BType(numberedCode[i][start:]) or JType(numberedCode[i][start:]):
+            foundLabel=False
             currentLineNum=i
             label=numberedCode[i].split(',')[-1]
             for k,v in numberedCode.items():
                 a=v.find(':')
                 if label==v[0:a]:
                     diff=k-currentLineNum
+                    foundLabel=True
                     break
-            index=numberedCode[i].find(label)
+            if foundLabel:
+                index=numberedCode[i].find(label)
+            else:
+                print("Error: Label name \'",label,"\' not found") #change this to error format
+                return {}
             numberedCode[i]=numberedCode[i][0:index]+str(diff)
     return numberedCode
 
