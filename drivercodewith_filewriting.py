@@ -241,3 +241,8 @@ def code_for_a_single_line(x):
         a = b + " " + registers[variables[0]] + " " + opcode
         return a
         #print(a)
+final_string = ""
+for i in readlines:
+    line = code_for_a_single_line(i)
+    final_string += line
+    final_string += "\n"
