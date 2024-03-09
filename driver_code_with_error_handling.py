@@ -110,7 +110,7 @@ def code_for_a_single_line(x):
             raise InstructionSyntaxError(f"incorrect format for {Instruction} instruction")
         if InstructionType in ["B","I"]:
             for i in range(0,2):
-                variables[i] = values[i]
+                variables[i] = Values[i]
                 if Values[i] not in registers:
                     raise RegisterError(f"{Values[i]} is not a vaild register")
             try:
