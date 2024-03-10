@@ -120,7 +120,13 @@ def code_for_a_single_line(x):
                          "S":["sw"] , 
                          "B":["beq" , "bne" , "blt" , "bge" , "bltu" , "bgeu"] , 
                          "U":["lui" , "auipc"] , 
-                         "J":["jal"]}
+                         "J":["jal"],
+                        "bonus" : ["mul" , "rst" , "halt" , "rvrs"]}
+    
+    #assumed "halt" in machine code is "00000000000000000000000000000000"
+    #assumed "rst" in machine code is "10000000000000000000000000000000"
+    #assumed "rvrs rd,rs" in machine code is "000000000000[rs1]111[rd]0000000"
+    #assumed "mul rd,rs1,rs2" in machine code is "1000000[rs2][rs1]111[rd]0000000"
 
     registers = { "zero" : "00000" ,
                 "ra" : "00001" ,
@@ -154,15 +160,39 @@ def code_for_a_single_line(x):
                 "t3" : "11100" , 
                 "t4" : "11101" , 
                 "t5" : "11110" , 
-                "t6" : "11111" , }
+                "t6" : "11111"  }
+    
+    if x == "halt":
+        return "00000000000000000000000000000000"
+    
+    if x == "rst":
+        return "10000000000000000000000000000000"
+    
+    if "rvrs" in x:
+        Instruction = x.split(" ")[0]
+        try:
+            Values = x.split(" ")[1].split(",")
+            return "000000000000" + registers[Values[1]] + "111" + registers[Values[0]] + "0000000"
+        except:
+            raise InstructionError(f"{Instruction} operation is not defined")
+    
+    if "mul" in x:
+        Instruction = x.split(" ")[0]
+        try:
+            Values = x.split(" ")[1].split(",")
+            return "1000000" + registers[Values[2]] + registers[Values[1]] + "111" + registers[Values[0]] + "0000000"
+        except:
+            raise InstructionError(f"{Instruction} operation is not defined")
+        
+        
 
     Instruction = x.split(" ")[0]
     try:
         Values = x.split(" ")[1].split(",")
     except:
-        raise InstructionError(f"{Instruction} operation is not defined")#Need to change later
+        raise InstructionError(f"{Instruction} operation is not defined") #Need to change later
     variables = ["r1","r2","r3","immediate value"] 
-    instruction_not_defined = True#error handling start
+    instruction_not_defined = True #error handling start
     for a in instruction_types:
         for b in instruction_types[a]:
             if b == Instruction:
@@ -340,4 +370,3 @@ file = open("machine.txt",'w')
 file.write(final_code)
 
 file.close()
-  
