@@ -19,7 +19,7 @@ def readFile():
     if code[-1][-1]!='n':
         code[-1]=code[-1]+'\n'
     for line in code:
-        numberedCode[lineNumber]=line[0:-1]
+        numberedCode[lineNumber]=line[0:-1].strip()
         lineNumber+=1
     return numberedCode,lineNumber-1
 
@@ -41,9 +41,13 @@ def labelConvert():
     for i in range(1,numberOfLines+1):
         start=numberedCode[i].find(':')+1
         if BType(numberedCode[i][start:]) or JType(numberedCode[i][start:]):
+            label = numberedCode[i].split(',')[-1]
+            if (label.isdigit()) or (label[1:].isdigit() and label[0] == "-"):
+                break
+                
             foundLabel=False
             currentLineNum=i
-            label=numberedCode[i].split(',')[-1]
+
             for k,v in numberedCode.items():
                 a=v.find(':')
                 if label==v[0:a]:
@@ -62,6 +66,10 @@ def removeAllLabels():
     labelConverted=labelConvert()
     for k,v in labelConverted.items():
         a=v.find(':')+1
-        print(k,v,a)
-        labelConverted[k]=v[a:]
+        if v[a] == " ":
+            a = a + 1
+            labelConverted[k]=v[a:]
+        else:
+            labelConverted[k]=v[a:]
+        #print(k,v,a)
     return labelConverted
