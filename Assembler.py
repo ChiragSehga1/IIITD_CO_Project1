@@ -1,3 +1,5 @@
+import sys
+
 class InstructionError(Exception):
     def __init__(self,message):
         super().__init__(self.message)
@@ -27,9 +29,9 @@ class LabelError(Exception):
         self.message = message
 
         
-def readFile():
+def readFile(x):
     """Reads code from file and store them in a numbered hashmap, as well as number of lines in program"""
-    file = open("assembly.txt",'r')
+    file = open(x,'r')
     code=list(file.readlines())
     lineNumber=1
     numberedCode={}
@@ -57,9 +59,9 @@ def JType(a):
     """checks if an instruction line 'a' is JType"""
     return a[0:3]=="jal"
 
-def labelConvert():
+def labelConvert(x):
     """Converts all labels in the numberedCode to line difference between current and label line, and returns a numbered hashmap of the same"""
-    numberedCode,numberOfLines=readFile()
+    numberedCode,numberOfLines=readFile(x)
     #making a dictionary while label converting
     for i in range(1,numberOfLines+1):
         start=numberedCode[i].find(':')+1
@@ -84,8 +86,8 @@ def labelConvert():
             numberedCode[i]=numberedCode[i][0:index]+str(diff)
     return numberedCode
 
-def removeAllLabels():
-    labelConverted=labelConvert()
+def removeAllLabels(x):
+    labelConverted=labelConvert(x)
     for k,v in labelConverted.items():
         a=v.find(':')+1
         if v[a] == " ":
@@ -354,7 +356,11 @@ def code_for_a_single_line(x , y):
         return "000000000000" + registers[variables[1]] + "111" + registers[variables[0]] + "0000000"
 
 count = 1
-LOC = removeAllLabels()
+
+input_file = str(sys.argv[1])
+output_file = str(sys.argv[2])
+
+LOC = removeAllLabels(input_file)
 list_of_LOC = []
 
 while count in LOC:
@@ -383,7 +389,7 @@ for codeline in list_of_LOC:
 final_code = final_code[:-1]
 
 
-file = open("machine.txt",'w')
+file = open(output_file,'w')
 file.write(final_code)
 
 file.close()
