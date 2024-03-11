@@ -1,3 +1,31 @@
+class InstructionError(Exception):
+    def __init__(self,message):
+        super().__init__(self.message)
+
+class RegisterError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+class InstructionSyntaxError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+class VirtualHaltError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+class ImmediateError(Exception):
+    def __init__(self,message):
+        self.message = message
+
+class LastLineError(Exception):
+    def __init__(self,message):
+        self.message = message
+        
+class LabelError(Exception):
+    def __init__(self,message):
+        self.message = message
+
 def readFile():
     """Reads code from file and store them in a numbered hashmap, as well as number of lines in program"""
     file = open("assembly.txt",'r')
@@ -51,8 +79,7 @@ def labelConvert():
             if foundLabel:
                 index=numberedCode[i].find(label)
             else:
-                print("Error: Label name \'",label,"\' not found") #change this to error format
-                return {}
+                raise LabelError(f"Label not found for label {label} referenced at line {currentLineNum}")
             numberedCode[i]=numberedCode[i][0:index]+str(diff)
     return numberedCode
 
@@ -90,6 +117,10 @@ class ImmediateError(Exception):
         self.message = message
 
 class LastLineError(Exception):
+    def __init__(self,message):
+        self.message = message
+        
+class LabelError(Exception):
     def __init__(self,message):
         self.message = message
 
