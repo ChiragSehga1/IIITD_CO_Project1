@@ -342,6 +342,7 @@ does_error_exist = ""
 
 if "beq zero,zero,0" in list_of_LOC:
     if list_of_LOC[-1] != "beq zero,zero,0":
+        y = list_of_LOC.index("beq zero,zero,0")
         does_error_exist = f"LastLineError: Virtual Halt is not the last line of the code (at line {y} instead)"
 else:
     does_error_exist = "VirtualHaltError: Virtual Halt is not present"
