@@ -7,9 +7,15 @@ def readFile():
     if code[-1][-1]!='n':
         code[-1]=code[-1]+'\n'
     for line in code:
+        if line == "\n":
+            continue
         numberedCode[lineNumber]=line[0:-1].strip()
         lineNumber+=1
-    return numberedCode,lineNumber-1
+    lineNumber -= 1
+    while numberedCode[lineNumber] == "":
+        del numberedCode[lineNumber]
+        lineNumber -= 1
+    return numberedCode,lineNumber
 
 def BType(a):
     """checks if an instruction line 'a' is BType"""
