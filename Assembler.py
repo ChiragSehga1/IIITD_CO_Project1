@@ -343,9 +343,9 @@ while count in LOC:
 
 if "beq zero,zero,0" in list_of_LOC:
     if list_of_LOC[-1] != "beq zero,zero,0":
-        pass #halt is there but it is not the last element  ERROR
+        raise LastLineError("Virtual Halt is not the last line of the code")
 else:
-    pass #halt is not there in the code ERROR
+    raise VirtualHaltError("Virtual Halt is not present")
     
 
 final_code = ""
