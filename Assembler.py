@@ -83,6 +83,9 @@ class ImmediateError(Exception):
     def __init__(self,message):
         self.message = message
 
+class LastLineError(Exception):
+    def __init__(self,message):
+        self.message = message
 
 def twoscompliment(x , n):
     num = int(x)
@@ -167,24 +170,7 @@ def code_for_a_single_line(x):
     
     if x == "rst":
         return "10000000000000000000000000000000"
-    
-    if "rvrs" in x:
-        Instruction = x.split(" ")[0]
-        try:
-            Values = x.split(" ")[1].split(",")
-            return "000000000000" + registers[Values[1]] + "111" + registers[Values[0]] + "0000000"
-        except:
-            raise InstructionError(f"{Instruction} operation is not defined")
-    
-    if "mul" in x:
-        Instruction = x.split(" ")[0]
-        try:
-            Values = x.split(" ")[1].split(",")
-            return "1000000" + registers[Values[2]] + registers[Values[1]] + "111" + registers[Values[0]] + "0000000"
-        except:
-            raise InstructionError(f"{Instruction} operation is not defined")
-        
-        
+                
 
     Instruction = x.split(" ")[0]
     try:
@@ -201,7 +187,7 @@ def code_for_a_single_line(x):
                 break
     if instruction_not_defined:
         raise InstructionError(f"{Instruction} operation is not defined")
-    if Instruction not in ["lw","sw","lui","auipc","jal"]:
+    if Instruction not in ["lw","sw","lui","auipc","jal","rvrs"]:
         if len(Values)!=3:#change 2
             raise InstructionSyntaxError(f"incorrect format for {Instruction} instruction")
         if InstructionType in ["B","I"]:
@@ -244,17 +230,18 @@ def code_for_a_single_line(x):
         else:
             if (Values[0] not in registers):
                 raise RegisterError(f"{Values[0]} is not a vaild register")
-            try:
-                if InstructionType == "J":
-                    immediate = twoscompliment(Values[1] , 21)
-                else:
-                    immediate = twoscompliment(Values[1] , 32)
-
-            except ValueError:
-                raise ImmediateError(f"{immediate} is an invalid immmediate value")
-
-            variables[0] = Values[0]
-            variables[3] = immediate #error handling end
+            if Instruction == "rvrs":
+                variables[1] = Values[1]
+            else:
+                try:
+                    if InstructionType == "J":
+                        immediate = twoscompliment(Values[1] , 21)
+                    else:
+                        immediate = twoscompliment(Values[1] , 32)
+                    variables[3] = immediate #error handling end
+                except ValueError:
+                    raise ImmediateError(f"{immediate} is an invalid immmediate value")
+            variables[0] = Values[0] #error handling end
 
     if InstructionType == "R":        
         if  Instruction == "sub":
@@ -337,6 +324,12 @@ def code_for_a_single_line(x):
         a = b + registers[variables[0]]  + opcode
         return a
         #print(a)
+
+    if "mul" in x:
+        return "1000000" + registers[variables[2]] + registers[variables[1]] + "111" + registers[variables[0]] + "0000000"
+
+    if "rvrs" in x:
+        return "000000000000" + registers[variables[1]] + "111" + registers[variables[0]] + "0000000"
 
 count = 1
 LOC = removeAllLabels()
