@@ -1,34 +1,5 @@
 import sys
 
-class InstructionError(Exception):
-    def __init__(self,message):
-        super().__init__(self.message)
-
-class RegisterError(Exception):
-    def __init__(self,message):
-        self.message = message
-
-class InstructionSyntaxError(Exception):
-    def __init__(self,message):
-        self.message = message
-
-class VirtualHaltError(Exception):
-    def __init__(self,message):
-        self.message = message
-
-class ImmediateError(Exception):
-    def __init__(self,message):
-        self.message = message
-
-class LastLineError(Exception):
-    def __init__(self,message):
-        self.message = message
-        
-class LabelError(Exception):
-    def __init__(self,message):
-        self.message = message
-
-        
 def readFile(x):
     """Reads code from file and store them in a numbered hashmap, as well as number of lines in program"""
     file = open(x,'r')
@@ -82,7 +53,7 @@ def labelConvert(x):
             if foundLabel:
                 index = numberedCode[i].find(label)
             else:
-                raise LabelError(f"Label not found for label {label} referenced at line {currentLineNum}")
+                return (f"LabelError: Label not found for label {label} referenced at line {currentLineNum}")
             numberedCode[i]=numberedCode[i][0:index]+str(diff)
     return numberedCode
 
@@ -187,7 +158,7 @@ def code_for_a_single_line(x , y):
     try:
         Values = x.split(" ")[1].split(",")
     except:
-        raise InstructionError(f"{Instruction} operation is not defined at line {y}") #Need to change later
+        return (f"InstructionError: {Instruction} operation is not defined at line {y}") #Need to change later
     variables = ["r1","r2","r3","immediate value"] 
     instruction_not_defined = True #error handling start
     for a in instruction_types:
@@ -197,59 +168,59 @@ def code_for_a_single_line(x , y):
                 instruction_not_defined = False
                 break
     if instruction_not_defined:
-        raise InstructionError(f"{Instruction} operation is not defined at line {y}")
+        return (f"InstructionError: {Instruction} operation is not defined at line {y}")
     if Instruction not in ["lw","sw","lui","auipc","jal","rvrs"]:
         if len(Values)!=3:#change 2
-            raise InstructionSyntaxError(f"incorrect format for {Instruction} instruction at line {y}")
+            return (f"InstructionSyntaxError: incorrect format for {Instruction} instruction at line {y}")
         if InstructionType in ["B","I"]:
             for i in range(0,2):
                 variables[i] = Values[i]
                 if Values[i] not in registers:
-                    raise RegisterError(f"{Values[i]} is not a vaild register at line {y}")
+                    return (f"RegisterError: {Values[i]} is not a vaild register at line {y}")
             try:
                 if InstructionType == "B":
                     immediate = twoscompliment(Values[2] , 13)
                     if immediate == "ERROR":
-                        raise ImmediateError(f"{Values[2]} is an invalid immediate value at line {y}")
+                        return (f"ImmediateError: {Values[2]} is an invalid immediate value at line {y}")
                         ##################################################################
                 else:
                     immediate = twoscompliment(Values[2] , 12)
                     if immediate == "ERROR":
-                        raise ImmediateError(f"{Values[2]} is an invalid immediate value at line {y}")
+                        return (f"ImmediateError: {Values[2]} is an invalid immediate value at line {y}")
                         ################################################################
                 variables[3] = immediate
             except ValueError:
-                raise ImmediateError(f"{Values[2]} is an invalid immmediate value at line {y}")#
+                return (f"ImmediateError: {Values[2]} is an invalid immmediate value at line {y}")#
 
         else: 
             for i in range(0,3):
                 variables[i] = Values[i]
                 if Values[i] not in registers:
-                    raise RegisterError(f"{Values[i]} is not a vaild register at line {y}")                    
+                    return (f"RegisterError: {Values[i]} is not a vaild register at line {y}")                    
 
     else:
         if len(Values)!=2:#change 2
-            raise InstructionSyntaxError(f"incorrect format for {Instruction} instruction at line {y}")
+            return (f"InstructionSyntaxError: incorrect format for {Instruction} instruction at line {y}")
         if Instruction in ["lw","sw"]:
             immediate = Values[1].split("(")[0]
             sr = (Values[1].split("(")[1])[0:-1]
             if (Values[0] not in registers):
-                raise RegisterError(f"{Values[0]} is not a vaild register at line {y}")
+                return (f"RegisterError: {Values[0]} is not a vaild register at line {y}")
             if (sr not in registers):
-                raise RegisterError(f"{sr} is not a vaild register at line {y}")
+                return (f"RegisterError: {sr} is not a vaild register at line {y}")
             try:
                 immediate = twoscompliment(immediate , 12)
                 if immediate == "ERROR":
-                    raise ImmediateError(f"{immediate} is an invalid immediate value at line {y}")
+                    return (f"ImmediateError: {immediate} is an invalid immediate value at line {y}")
             except ValueError:
-                raise ImmediateError(f"{immediate} is an invalid immmediate value at line {y}")
+                return (f"ImmediateError: {immediate} is an invalid immmediate value at line {y}")
             variables[0] = Values[0]
             variables[1] = sr
             
             variables[3] = immediate
         else:
             if (Values[0] not in registers):
-                raise RegisterError(f"{Values[0]} is not a vaild register at line {y}")
+                return (f"RegisterError: {Values[0]} is not a vaild register at line {y}")
             if Instruction == "rvrs":
                 variables[1] = Values[1]
             else:
@@ -257,14 +228,14 @@ def code_for_a_single_line(x , y):
                     if InstructionType == "J":
                         immediate = twoscompliment(Values[1] , 21)
                         if immediate == "ERROR":
-                            raise ImmediateError(f"{Values[1]} is an invalid immediate value at line {y}")
+                            return (f"ImmediateError: {Values[1]} is an invalid immediate value at line {y}")
                     else:
                         immediate = twoscompliment(Values[1] , 32)
                         if immediate == "ERROR":
-                            raise ImmediateError(f"{Values[1]} is an invalid immediate value at line {y}")
+                            return (f"ImmediateError: {Values[1]} is an invalid immediate value at line {y}")
                     variables[3] = immediate #error handling end
-                except ValueError:
-                    raise ImmediateError(f"{immediate} is an invalid immmediate value at line {y}")
+                except:
+                    return (f"ImmediateError: {immediate} is an invalid immmediate value at line {y}")
             variables[0] = Values[0] #error handling end
 
     if InstructionType == "R":        
@@ -371,9 +342,9 @@ while count in LOC:
 
 if "beq zero,zero,0" in list_of_LOC:
     if list_of_LOC[-1] != "beq zero,zero,0":
-        raise LastLineError(f"Virtual Halt is not the last line of the code (at line {y} instead)")
+        return (f"LastLineError: Virtual Halt is not the last line of the code (at line {y} instead)")
 else:
-    raise VirtualHaltError("Virtual Halt is not present")
+    return ("VirtualHaltError: Virtual Halt is not present")
     
 
 final_code = ""
@@ -381,6 +352,9 @@ final_code = ""
 count = 1
 for codeline in list_of_LOC:
     code_of_a_line = code_for_a_single_line(codeline , count)
+    if "Error" in code_of_a_line:
+        final_code = code_of_a_line + " "
+        break
     count += 1
     if code_of_a_line == "":
         continue
