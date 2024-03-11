@@ -365,7 +365,7 @@ while count in LOC:
 
 if "beq zero,zero,0" in list_of_LOC:
     if list_of_LOC[-1] != "beq zero,zero,0":
-        raise LastLineError("Virtual Halt is not the last line of the code (at line {y} instead)")
+        raise LastLineError(f"Virtual Halt is not the last line of the code (at line {y} instead)")
 else:
     raise VirtualHaltError("Virtual Halt is not present")
     
