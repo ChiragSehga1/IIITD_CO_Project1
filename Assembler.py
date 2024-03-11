@@ -338,28 +338,30 @@ while count in LOC:
     list_of_LOC = list_of_LOC + [LOC[count]]
     count += 1
 
-    
+does_error_exist = ""
 
 if "beq zero,zero,0" in list_of_LOC:
     if list_of_LOC[-1] != "beq zero,zero,0":
-        return (f"LastLineError: Virtual Halt is not the last line of the code (at line {y} instead)")
+        does_error_exist = f"LastLineError: Virtual Halt is not the last line of the code (at line {y} instead)"
 else:
-    return ("VirtualHaltError: Virtual Halt is not present")
+    does_error_exist = "VirtualHaltError: Virtual Halt is not present"
     
 
 final_code = ""
-
-count = 1
-for codeline in list_of_LOC:
-    code_of_a_line = code_for_a_single_line(codeline , count)
-    if "Error" in code_of_a_line:
-        final_code = code_of_a_line + " "
-        break
-    count += 1
-    if code_of_a_line == "":
-        continue
-    else:
-        final_code = final_code + code_of_a_line + "\n"
+if does_error_exist != "":
+    final_code = does_error_exist + " "
+else:
+    count = 1
+    for codeline in list_of_LOC:
+        code_of_a_line = code_for_a_single_line(codeline , count)
+        if "Error" in code_of_a_line:
+            final_code = code_of_a_line + " "
+            break
+        count += 1
+        if code_of_a_line == "":
+            continue
+        else:
+            final_code = final_code + code_of_a_line + "\n"
 final_code = final_code[:-1]
 
 
