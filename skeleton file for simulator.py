@@ -37,16 +37,16 @@ This is the sample I will write the requirments in
 
 
 # program stub to iterate through the entire code and find errors, raise errors if any
+# possible errors till now - undefined opcode
+#                            virtual halt not present/not at the end
+#                            ...(maybe more to be added)
 
 
 # program stub to convert binary to decimal which takes 2 arguments, number of bits<int> 
 # and the number <str> and returns a decimal number<int>
 
 
-# global variable register0 = 0
-# global variable register1 = 0
-#...
-# global variable register31 = 0
+#registers = {0:value of 0<int> , 1:value of 1<int> ... 31:value of 31<int>}
 
 
 # global variable program_counter = 0
