@@ -49,8 +49,13 @@ This is the sample I will write the requirments in
 # and the number <str> and returns a decimal number<int>
 
 
-#registers = {0:value of 0<int> , 1:value of 1<int> ... 31:value of 31<int>}
+#registers = {00000:[name of register , value of 0<int>] , 00001:[name of register , value of 1<int>] ... 11111:[name of register , value of 31<int>]}
 
+# global stack
+# stack = []
+
+#memory = {32 values}
+ 
 
 # global variable program_counter = 0
 # global variable stop = 0
