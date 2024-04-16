@@ -69,7 +69,7 @@ memory = {"0x00010000" : 0,
           "0x0001007c" : 0 }
 
 global program_counter
-program_counter= 5
+program_counter= 0
 global stop
 stop = 0
 
