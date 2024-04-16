@@ -1,7 +1,7 @@
 global registers
 registers = { "00000" : 0 ,
-              "00001" : 0  ,
-              "00010" : 0 ,
+              "00001" : 8  ,
+              "00010" : 7 ,
               "00011" : 0  , 
               "00100" : 0  ,
               "00101" : 0  ,
@@ -72,6 +72,7 @@ global program_counter
 program_counter= 0
 global stop
 stop = 0
+
 def DtoH(decimal):
     hex=''
     rem={0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'A',11:'B',12:'C',13:'D',14:'E',15:'F'}
@@ -80,28 +81,34 @@ def DtoH(decimal):
         print(hex)
         decimal=decimal//16
     return hex[-1:0:-1]+hex[0]
+
 def BtoD(binary):
     dec=0
     for i in range(0,len(binary)):
         dec=dec+int(binary[-(i+1)])*(2**(i))
     return dec
 
-def Btype(type_of_instruction,line_to_execute):
+def Btype(line_to_execute,type_of_instruction='B'):
     if (type_of_instruction=='B'):
         rs1=2
         rs2=2
         immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]
     return
 
-def Stype(type_of_instruction,line_to_execute):
+def Stype(line_to_execute,type_of_instruction='S'):
     if (type_of_instruction=='S'):
         immediate=line_to_execute[0:7]+line_to_execute[20:25]
         ra=line_to_execute[7:12] #r1
         sp=line_to_execute[12:17] #r2
         funct3=line_to_execute[17:20]
+        Hex=DtoH(registers[ra]+BtoD(immediate))
+        if(int(registers[ra]+BtoD(immediate))%4!=0):
+            print("Error, memory address is not a multiple of 4")
+            return
         mem='0x000100'+DtoH(registers[ra]+BtoD(immediate))
         memory[mem]=registers[sp]
         return
+
 
     
 
