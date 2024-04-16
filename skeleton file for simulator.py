@@ -27,14 +27,35 @@ lw a7, 53(a2)
 This is the sample I will write the requirments in
 """
 
-#AKSHAT
-# program stub to make a dictionary with name = "code"
-# returns a dictionary of the form {line number(in bytes)<int> : [line<str> , instruction type<char/str>]}
-# write "bonus" for the bonus instructions
-# for the example, it will finish with a dictionary code = {0 : ["00000000110001011000100010110011" , "R"],
-#                                                           4 : ["00000000110001011110100010110011" , "R"],
-#                                                           8 : ["00000011010101100010100010000011" , "I"],
-#                                                          12 : ["00000000000000000000000001100011" , "B"]]}
+import sys
+
+def readFile(x):
+    # Reads code from file and store them in a numbered hashmap, as well as number of lines in program
+    file = open( x ,'r')
+    binary = file.readlines()
+    for i in range (len(binary)):
+        binary[i] = binary[i].strip("\n")
+    dictionary = {}
+    for i in range(0,len(binary)):
+        line = binary[i]
+        opcode = line[-7:]
+        inst_type = None
+        if opcode == '0110011':
+            inst_type = 'R'
+        elif opcode in ['0000011','0010011','1100111']:
+            inst_type = 'I'            
+        elif opcode == '0100011':
+            inst_type = 'S'
+        elif opcode == '1100011':
+            inst_type = 'B'
+        elif opcode in ['0110111','0010111']:
+            inst_type = 'U'
+        elif opcode == '1101111':
+            inst_type = 'J'
+        dictionary[i*4] = [line,inst_type]
+
+    return dictionary
+
 
 
 #JASJYOT
