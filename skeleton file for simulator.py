@@ -90,7 +90,6 @@ def bin_to_int(x,y):#x=binary | y = s or u (signed or unsigned)
     for i in range(32): #converts binary to integer
         if x[i] == '1':
             out += 1*2**(31-i)
-    print(x)
     out *= sign #turns int negative if binary is negative
     return out
 
