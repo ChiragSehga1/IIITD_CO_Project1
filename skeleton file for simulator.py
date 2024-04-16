@@ -62,7 +62,7 @@ def readFile(x):
 # program stub to convert binary to decimal which takes 2 arguments, number of bits<int> 
 # and the number <str> and returns a decimal number<int>
 
-def bin_to_int(x,y):#x=binary | y = s or u (signed or unsigned)
+def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
     sign = 1 #remembers if binary is positive
     if (y == 's'):
         if len(x) < 32: #sign extends signed binary
