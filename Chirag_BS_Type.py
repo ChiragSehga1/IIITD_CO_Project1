@@ -1,7 +1,7 @@
 global registers
 registers = { "00000" : 0 ,
-              "00001" : 0  ,
-              "00010" : 0 ,
+              "00001" : 9  ,
+              "00010" : 7 ,
               "00011" : 0  , 
               "00100" : 0  ,
               "00101" : 0  ,
@@ -73,64 +73,70 @@ program_counter= 0
 global stop
 stop = 0
 
+"""copy paste lines 81 to 96 to general function definitions 
+If conflicted
+DtoH is called in line 130 only (and in Akshat's code)
+BtoD is called in lines 106 and 131
+"""
 def DtoH(decimal):
+    #takes an integer in decimal and returns a converted string in hexadecimal
     hex=''
     rem={0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'A',11:'B',12:'C',13:'D',14:'E',15:'F'}
     while(decimal>0):
         hex+=rem[decimal%16]
-        print(hex)
         decimal=decimal//16
     return hex[-1:0:-1]+hex[0]
 
 def BtoD(binary):
+    #takes a binary in string and returns a converted integer in decimal
     dec=0
     for i in range(0,len(binary)):
         dec=dec+int(binary[-(i+1)])*(2**(i))
     return dec
 
-def Btype(line_to_execute,type_of_instruction='B'):
 
-    if (type_of_instruction=='B'):
-        rs1=line_to_execute[7:12]
-        rs2=line_to_execute[12:17]
-        funct3=line_to_execute[17:20]
-        immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
-        offset=BtoD(immediate)
+type_of_instruction='S'
+line_to_execute="00000010000100010010000000100011"
 
-        #beq
-        if (funct3=="000" and registers[rs1]==registers[rs2]):
-            program_counter+=offset
-        #bne
-        elif (funct3=="001" and registers[rs1]!=registers[rs2]):
-            program_counter+=offset
-        #blt
-        elif (funct3=="100" and registers[rs1]<registers[rs2]):
-            program_counter+=offset
-        #bge
-        elif (funct3=="101" and registers[rs1]>=registers[rs2]):
-            program_counter+=offset
-        #bltu
-        elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
-            program_counter+=offset
-        #bgeu
-        elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
-            program_counter+=offset
+#copy paste line 102 to 125 to B-Type instruction condition
+if (type_of_instruction=='B'):
+    rs1=line_to_execute[7:12]
+    rs2=line_to_execute[12:17]
+    funct3=line_to_execute[17:20]
+    immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
+    offset=BtoD(immediate)
+    #beq
+    if (funct3=="000" and registers[rs1]==registers[rs2]):
+        program_counter+=offset
+    #bne
+    elif (funct3=="001" and registers[rs1]!=registers[rs2]):
+        program_counter+=offset
+    #blt
+    elif (funct3=="100" and registers[rs1]<registers[rs2]):
+        program_counter+=offset
+    #bge
+    elif (funct3=="101" and registers[rs1]>=registers[rs2]):
+        program_counter+=offset
+    #bltu
+    elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
+        program_counter+=offset
+    #bgeu
+    elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
+        program_counter+=offset
 
-    return
+#copy paste line 128 to 138 to S-Type instruction condition
+if (type_of_instruction=='S'):
+    immediate=line_to_execute[0:7]+line_to_execute[20:25]
+    ra=line_to_execute[7:12] #r1
+    sp=line_to_execute[12:17] #r2
+    funct3=line_to_execute[17:20]
+    imm=BtoD(immediate)
+    Hex=DtoH(registers[ra]+imm)
+    if((int(registers[ra])+imm)%4!=0):
+        print("Error, memory address is not a multiple of 4")
+    mem='0x000100'+Hex
+    memory[mem]=registers[sp]
 
-def Stype(line_to_execute,type_of_instruction='S'):
-    if (type_of_instruction=='S'):
-        immediate=line_to_execute[0:7]+line_to_execute[20:25]
-        ra=line_to_execute[7:12] #r1
-        sp=line_to_execute[12:17] #r2
-        funct3=line_to_execute[17:20]
-        Hex=DtoH(registers[ra]+BtoD(immediate))
-        if(int(registers[ra]+BtoD(immediate))%4!=0):
-            print("Error, memory address is not a multiple of 4")
-            return
-        mem='0x000100'+DtoH(registers[ra]+BtoD(immediate))
-        memory[mem]=registers[sp]
-        return
-Btype("00001100111101101100010001100011")
+print(memory)
 print(program_counter)
     
