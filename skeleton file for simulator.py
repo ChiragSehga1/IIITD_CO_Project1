@@ -62,6 +62,38 @@ def readFile(x):
 # program stub to convert binary to decimal which takes 2 arguments, number of bits<int> 
 # and the number <str> and returns a decimal number<int>
 
+def bin_to_int(x,y):#x=binary | y = s or u (signed or unsigned)
+    if (y == 's'):
+        if len(x) < 32:
+            x = x[0]*(32-len(x)) + x
+        x = list(x)
+        if x[0] == '1':
+            for i in range(32):
+                if x[i] == '0':
+                    x[i] = '1'
+                else:
+                    x[i] = '0'
+            if x[-1] == '0':
+                x[-1] = '1'
+            else:
+                i = 31
+                while (x[i] == '1'):
+                    x[i] = '0'
+                    i -= 1
+                x[i] = '1'
+    else:
+        x = '0'*(32-len(x)) + x
+        list(x)
+    out = 0
+    for i in range(32):
+        if x[i] == '1':
+            out += 1*2**(31-i)
+    print(x)
+    if y == 's' and x[0] == '1':
+        out *= -1
+    return out
+
+
 global registers
 registers = { "00000" : 0 ,
               "00001" : 0  ,
