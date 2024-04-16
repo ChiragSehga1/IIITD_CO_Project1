@@ -63,17 +63,19 @@ def readFile(x):
 # and the number <str> and returns a decimal number<int>
 
 def bin_to_int(x,y):#x=binary | y = s or u (signed or unsigned)
+    sign = 1 #remembers if binary is positive
     if (y == 's'):
-        if len(x) < 32:
+        if len(x) < 32: #sign extends signed binary
             x = x[0]*(32-len(x)) + x
         x = list(x)
-        if x[0] == '1':
-            for i in range(32):
+        if x[0] == '1': #converts negative binary to twos complement positive number
+            sign = -1
+            for i in range(32):#bit flip
                 if x[i] == '0':
                     x[i] = '1'
                 else:
                     x[i] = '0'
-            if x[-1] == '0':
+            if x[-1] == '0':#plus 1
                 x[-1] = '1'
             else:
                 i = 31
@@ -81,16 +83,15 @@ def bin_to_int(x,y):#x=binary | y = s or u (signed or unsigned)
                     x[i] = '0'
                     i -= 1
                 x[i] = '1'
-    else:
+    else:#converts unsigned binary to twos compliment
         x = '0'*(32-len(x)) + x
         list(x)
     out = 0
-    for i in range(32):
+    for i in range(32): #converts binary to integer
         if x[i] == '1':
             out += 1*2**(31-i)
     print(x)
-    if y == 's' and x[0] == '1':
-        out *= -1
+    out *= sign #turns int negative if binary is negative
     return out
 
 
