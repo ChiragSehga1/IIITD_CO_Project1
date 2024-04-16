@@ -164,9 +164,11 @@ memory = {"0x00010000" : 0,
           "0x00010078" : 0, 
           "0x0001007c" : 0 }
  
+global program_counter
+program_counter= 0
+global stop
+stop = 0
 
-global program_counter = 0
-global stop = 0
 
 def bonus_type(line_to_execute):
     if (line_to_execute == "00000000000000000000000000000000"):
