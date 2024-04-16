@@ -133,7 +133,7 @@ memory = {"0x00010000" : 0,
           "0x0001007c" : 0 }
  
 
-global program_counter = 4
+global program_counter = 0
 global stop = 0
 
 def bonus_type(line_to_execute):
