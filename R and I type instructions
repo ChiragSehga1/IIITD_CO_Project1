@@ -1,0 +1,55 @@
+def R(line):
+    rsd = line[-12:-7]
+    rs1 = line[-20:-15]
+    rs2 = line[-25:-20]
+    func7 = line[0:7]
+    func3 = line[-15:-12]
+    if func7 == '0100000':
+        registers[rsd] = twoscompliment(bin_to_int(registers[rs1],'s') - bin_to_int(registers[rs2],'s'))#sub
+    elif func3 == '000':
+        registers[rsd] = twoscompliment(bin_to_int(registers[rs1],'s') + bin_to_int(registers[rs2],'s'))#add
+    elif func3 == '001':#left shift
+        registers[rsd] = registers[rs2][-5::] + registers[rs1][5::] 
+    elif func3 == '010':
+        if bin_to_int(registers[rs1],'s') < bin_to_int(registers[rs1],'s'):#slt
+            register[rsd] = 1
+        else:
+            register[rsd] = 0
+    elif func3 == '011':
+        if bin_to_int(registers[rs1]) < bin_to_int(registers[rs1]):#sltu
+            register[rsd] = 1
+        else:
+            register[rsd] = 0
+    elif func3 == '100': #xor
+        registers[rsd] = registers[rs1] ^ registers[rs2]
+    elif func3 == '101':#right shift
+        registers[rsd] = registers[rs1][0:-5] + register[rs2][-5::]
+    elif func3 == '110':#or
+        registers[rsd] = registers[rs1] | registers[rs2]
+    elif func3 == '111':#or
+        registers[rsd] = registers[rs1] & registers[rs2]
+
+def I(line):
+    opcode = line[-7::]
+    rsd = line[-12:-7]
+    func3 = line[-15:-12]
+    rs1 = line[-20:-15]
+    imm = line[0:11]
+    if opcode == '0000011':#lw
+        registers[rsd] = memory[bin_to_int(rs1,'s') + bin_to_int(imm,'s')]
+    elif opcode == '0010011':
+        if func3 == '000':#addi
+            registers[rsd] = bin_to_int(registers[rs1],'s') + bin_to_int(imm,'s')
+        else:#sltiu
+            if bin_to_int(registers[rs1]) < bin_to_int(imm):
+                registers[rsd] = 1
+            else:
+                register[rsd] = 0
+    elif opcode == '1100111':#jalr
+        registers[rd] = program_counter + 4
+        temp = bin_to_int(registers[rs1]) + bin_to_int(imm)#
+        if temp % 2 != 0:#temp exists because in the cornell simulator, program counter just needs to be even for jalr instructions but if program_counter isn't divisible by 4 then it doesn't jump
+            temp -= 1
+        if temp % 4 == 0:
+            program_counter = temp
+            updated = 1
