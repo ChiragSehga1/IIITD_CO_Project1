@@ -357,8 +357,15 @@ def Itype(line):
         if temp % 4 == 0:
             program_counter[1] = temp
             updated[1] = 1
-    
-code = readFile("trial.txt")
+
+            
+input_file = str(sys.argv[1])
+output_file = str(sys.argv[2])
+
+writer = open(output_file , 'w')
+
+
+code = readFile(input_file)
 
     
 while (stop[1] == 0) and (program_counter[1] in code) :
@@ -384,19 +391,21 @@ while (stop[1] == 0) and (program_counter[1] in code) :
     if updated[1] == 1:
         updated[1] = 0
         print(twoscompliment2(program_counter[1]) , end = " ")
+        writer.write(str(twoscompliment2(program_counter[1])) + " ")
         for i in registers:
-            print (twoscompliment2(registers[i]) , end = " ")
-        print()
+            writer.write(str(twoscompliment2(registers[i])) + " ")
+        writer.write("\n")
         continue
-    print(twoscompliment2(program_counter[1]) , end = " ")
+    writer.write(str(twoscompliment2(program_counter[1])) + " ")
     for i in registers:
-        print (twoscompliment2(registers[i]) , end = " ")
-    print()
+        writer.write(str(twoscompliment2(registers[i])) + " ")
+    writer.write("\n")
     program_counter[1] += 4
 
-print (twoscompliment2(program_counter[1]) , end = " ")
+writer.write(str(twoscompliment2(program_counter[1])) + " ")
 for i in registers:
-    print (twoscompliment2(registers[i]) , end = " ")
-print()
+    writer.write(str(twoscompliment2(registers[i])) + " ")
+writer.write("\n")
     
-data_mem_output()
+for keys in memory:
+    writer.write(keys+':'+twoscompliment2(memory[keys]) + "\n")
