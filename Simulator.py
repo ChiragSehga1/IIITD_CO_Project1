@@ -231,8 +231,7 @@ def bonus_type(line_to_execute):
         first = line_to_execute[7:12]
         second = line_to_execute[12:17]
         third = line_to_execute[20:25]
-        #multiply first and second (ignore overflow) and store in third
-        
+        #multiply first and second (ignore overflow) and store in third     
 
 def Utype(x):
     imm = x[0:20] #loading top 20 bits of immediate value
@@ -255,7 +254,7 @@ def Jtype(x):
     program_counter[1] += b10
     updated[1] = 1
     
-def Btype(linetoexecute):
+def Btype(line_to_execute):
     if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
         stop[1] = 1
     rs1=line_to_execute[7:12]
@@ -327,7 +326,6 @@ def Rtype(line):
         registers[rsd] = registers[rs1] | registers[rs2]
     elif func3 == '111':#and
         registers[rsd] = registers[rs1] & registers[rs2]
-
 
 def Itype(line):
     
@@ -418,4 +416,3 @@ for keys in memory:
     writer.write(keys+':'+twoscompliment2(memory[keys]) + "\n")
 
 writer.close()
-
