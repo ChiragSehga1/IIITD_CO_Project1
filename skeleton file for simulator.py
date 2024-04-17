@@ -12,7 +12,7 @@ def readFile(x):
         if i != "":
             binary = binary + [i]
     dictionary = {}
-    for i in range(0,len(binary)):
+    for i in range(0,(len(binary))):
         line = binary[i]
         opcode = line[-7:]
         inst_type = None
@@ -30,7 +30,7 @@ def readFile(x):
             inst_type = 'J'
         elif opcode == '0000000':
             inst_type = 'bonus'
-        dictionary[i*4] = [line,inst_type]
+        dictionary[(i+1)*4] = [line,inst_type]
 
     return dictionary
 
@@ -182,18 +182,18 @@ memory = {"0x00010000" : 0,
           "0x0001007c" : 0 }
  
 global program_counter
-program_counter= 0
+program_counter = {1 : 4}
 
 global stop
-stop = 0
+stop = {1 : 0}
 
 global updated
-updated = 0
+updated = {1 : 0}
 
 
 def bonus_type(line_to_execute):
     if (line_to_execute == "00000000000000000000000000000000"):
-        stop = 1
+        stop[1] = 1
         return
     if (line_to_execute == "10000000000000000000000000000000"):
         for i in registers:
@@ -212,28 +212,30 @@ def bonus_type(line_to_execute):
         pass # <=====================================================================================
 
 def Utype(x):
-    imm=x[0:20] #loading top 20 bits of immediate value
-    rd=x[20:25] #loading register value
-    opcode=x[25:]#loading opcode
+    imm = x[0:20] #loading top 20 bits of immediate value
+    rd = x[20:25] #loading register value
+    opcode = x[25:]#loading opcode
     upperimmvalue=imm+12*"0"#computing upperimmediate value
     value = bin_to_int(upperimmvalue,"s")#converting to integer
     if opcode=="0110111":#lui
-        registers[rd]=value
+        registers[rd] = value
     if opcode=="0010111":#auipc 
-        registers[rd]=program_counter+value
+        registers[rd] = program_counter[1] + value
         
 def Jtype(x):
     rd=x[20:25]
     opcode=x[25:]
     imm=x[0]+x[12:20]+x[11]+x[1:11]#reading the immediate value with correct syntax
-    registers[rd]=program_counter+4#storing return address in register
+    registers[rd] = program_counter[1] + 4 #storing return address in register
     b10=imm+"0"
     b10=bin_to_int(b10,"s")
-    program_counter+=b10
+    program_counter[1] += b10
+    updated[1] = 1
     
 def Btype(linetoexecute):
     if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
-        stop=1
+        stop[1] = 1
+        return
     rs1=line_to_execute[7:12]
     rs2=line_to_execute[12:17]
     funct3=line_to_execute[17:20]
@@ -241,22 +243,22 @@ def Btype(linetoexecute):
     offset=BtoD(immediate)
     #beq
     if (funct3=="000" and registers[rs1]==registers[rs2]):
-        program_counter+=offset
+        program_counter[1] +=offset
     #bne
     elif (funct3=="001" and registers[rs1]!=registers[rs2]):
-        program_counter+=offset
+        program_counter[1] +=offset
     #blt
     elif (funct3=="100" and registers[rs1]<registers[rs2]):
-        program_counter+=offset
+        program_counter[1] +=offset
     #bge
     elif (funct3=="101" and registers[rs1]>=registers[rs2]):
-        program_counter+=offset
+        program_counter[1] +=offset
     #bltu
     elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
-        program_counter+=offset
+        program_counter[1] +=offset
     #bgeu
     elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
-        program_counter+=offset
+        program_counter[1] +=offset
 
 def Stype(line_to_execute):
     immediate = line_to_execute[0:7]+line_to_execute[20:25]
@@ -326,24 +328,23 @@ def Itype(line):
             else:
                 register[rsd] = 0
     elif opcode == '1100111':#jalr
-        registers[rd] = program_counter + 4
+        registers[rd] = program_counter[1] + 4
         temp = registers[rs1] + bin_to_int(imm)#
         if temp % 2 != 0:#temp exists because in the cornell simulator, program counter just needs to be even for jalr instructions but if program_counter isn't divisible by 4 then it doesn't jump
             temp -= 1
         if temp % 4 == 0:
-            program_counter = temp
-            updated = 1
+            program_counter[1] = temp
+            updated[1] = 1
     
 code = readFile("trial.txt")
 
     
-while stop == 0 :
-    line_to_execute = code[program_counter][0]
-    type_of_intruction = code[program_counter][1]
+while (stop[1] == 0) and (program_counter[1] in code) :
+    line_to_execute = code[program_counter[1]][0]
+    type_of_intruction = code[program_counter[1]][1]
 
     if type_of_intruction == "R":#AKSHAT
         Rtype(line_to_execute)
-    
     elif type_of_intruction == "I":#AKSHAT
         Itype(line_to_execute)
     elif type_of_intruction == "S":#CHIRAG
@@ -356,15 +357,13 @@ while stop == 0 :
         Jtype(line_to_execute)
     elif type_of_intruction == "bonus":
         bonus_type(line_to_execute)
-    if updated == 1:
-        updated = 0
-        print(program_counter)
+    if updated[1] == 1:
+        updated[1] = 0
+        print(program_counter[1])
         for i in registers:
             print (i , " : " , registers[i])
-            pass
         continue
-    print(program_counter)
+    print(program_counter[1])
     for i in registers:
         print (i , " : " , registers[i])
-        pass
-    program_counter += 4
+    program_counter[1] += 4
