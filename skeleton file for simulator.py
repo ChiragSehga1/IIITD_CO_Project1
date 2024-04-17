@@ -168,7 +168,8 @@ global program_counter
 program_counter= 0
 global stop
 stop = 0
-
+global updated
+updated = 0
 
 def bonus_type(line_to_execute):
     if (line_to_execute == "00000000000000000000000000000000"):
