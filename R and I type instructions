@@ -104,7 +104,7 @@ def I(line):
         if func3 == '000':#addi
             registers[rsd] = registers[rs1] + bin_to_int(imm,'s')
         else:#sltiu
-            if registers[rs1] < bin_to_int(imm):
+            if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(imm):
                 registers[rsd] = 1
             else:
                 register[rsd] = 0
