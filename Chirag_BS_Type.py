@@ -105,7 +105,8 @@ to stop working when used inside of a function, so yeah
 for i in range(0,1): #only done for ease of testing of virutual halt, break
     if (type_of_instruction=='B'):
         if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
-            break #comment out 103,104 for testing
+          stop=1  
+          break #comment out 103,104 for testing
         rs1=line_to_execute[7:12]
         rs2=line_to_execute[12:17]
         funct3=line_to_execute[17:20]
