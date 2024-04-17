@@ -131,7 +131,7 @@ for i in range(0,1): #only done for ease of testing of virutual halt, break
         elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
             program_counter+=offset
 
-#copy paste till line 144 to S-Type instruction condition
+#copy paste till eof to S-Type instruction condition
 if (type_of_instruction=='S'):
     immediate=line_to_execute[0:7]+line_to_execute[20:25]
     ra=line_to_execute[7:12] #r1
