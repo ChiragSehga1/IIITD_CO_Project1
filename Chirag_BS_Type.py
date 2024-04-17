@@ -78,6 +78,38 @@ If conflicted
 DtoH is called in line 130 only (and in Akshat's code)
 BtoD is called in lines 106 and 131
 """
+
+def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
+    sign = 1 #remembers if binary is positive
+    if (y == 's'):
+        if len(x) < 32: #sign extends signed binary
+            x = x[0]*(32-len(x)) + x
+        x = list(x)
+        if x[0] == '1': #converts negative binary to twos complement positive number
+            sign = -1
+            for i in range(32):#bit flip
+                if x[i] == '0':
+                    x[i] = '1'
+                else:
+                    x[i] = '0'
+            if x[-1] == '0':#plus 1
+                x[-1] = '1'
+            else:
+                i = 31
+                while (x[i] == '1'):
+                    x[i] = '0'
+                    i -= 1
+                x[i] = '1'
+    else:#converts unsigned binary to twos compliment
+        x = '0'*(32-len(x)) + x
+        list(x)
+    out = 0
+    for i in range(32): #converts binary to integer
+        if x[i] == '1':
+            out += 1*2**(31-i)
+    out *= sign #turns int negative if binary is negative
+    return out
+
 def DtoH(decimal):
     #takes an integer in decimal and returns a converted string in hexadecimal
     hex=''
@@ -95,13 +127,14 @@ def BtoD(binary):
     return dec
 
 
+
 type_of_instruction='B'
-line_to_execute="00000000000000000000000001100011"
+line_to_execute="11110010111101101100110011100011"
 """
-I know this would've been better in a fucntion but my global seems 
+I know this would've been better in a function but my global seems 
 to stop working when used inside of a function, so yeah
 """
-#copy paste line till line 130 to B-Type instruction condition
+#copy and paste line till line 130 to B-Type instruction condition
 if (type_of_instruction=='B'):
     if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
         stop=1
@@ -109,7 +142,7 @@ if (type_of_instruction=='B'):
     rs2=line_to_execute[12:17]
     funct3=line_to_execute[17:20]
     immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
-    offset=BtoD(immediate)
+    offset=bin_to_int(immediate,'s')
     #beq
     if (funct3=="000" and registers[rs1]==registers[rs2]):
         program_counter+=offset
