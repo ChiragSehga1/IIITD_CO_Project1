@@ -127,7 +127,7 @@ def R(line):
         rs1 = twoscompliment(registers[rs1])
         rs2 = twoscompliment(registers[rs2])[-5::]
         shift = bin_to_int(rs2) * '0'
-        new = (rs1 + shift)[5::]
+        new = (rs1 + shift)[-32::]
         registers[rsd] = bin_to_int(new,'s')
     elif func3 == '010':
         if registers[rs1] < registers[rs2]:#slt
@@ -143,7 +143,7 @@ def R(line):
         rs1 = twoscompliment(registers[rs1])
         rs2 = twoscompliment(registers[rs2])[-5::]
         shift = bin_to_int(rs2) * '0'
-        new = (shift + rs1)[5::]
+        new = (shift + rs1)[0:33]
         registers[rsd] = bin_to_int(new,'s')
     elif func3 == '110':#or
         registers[rsd] = registers[rs1] | registers[rs2]
