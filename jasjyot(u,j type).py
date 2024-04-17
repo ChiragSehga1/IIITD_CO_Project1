@@ -36,7 +36,7 @@ def Utype(x):
     rd=x[20:25]#loading register value
     opcode=x[25:]#loading opcode
     upperimmvalue=imm+12*"0"#computing upperimmediate value
-    value = bin_to_int(upperimmvalue,s)#converting to integer
+    value = bin_to_int(upperimmvalue,'s')#converting to integer
     if opcode=="0110111":#lui
         registers[rd]=value
     if opcode=="0010111":#auipc 
