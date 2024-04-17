@@ -212,6 +212,6 @@ def Jtype(x):
     b10=imm+"0"
     b10=bin_to_int(b10,"s")
     program_counter+=b10
-    program_counter=program_counter//4
+    
     print(program_counter," ")
 Utype("001100010111")
