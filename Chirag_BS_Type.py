@@ -95,41 +95,39 @@ def BtoD(binary):
     return dec
 
 
-type_of_instruction='S'
-line_to_execute="00000010000100010010000000100011"
+type_of_instruction='B'
+line_to_execute="00000000000000000000000001100011"
 """
-I know this would've been better in a function but my global seems 
+I know this would've been better in a fucntion but my global seems 
 to stop working when used inside of a function, so yeah
 """
-#copy paste line till line 132 to B-Type instruction condition
-for i in range(0,1): #only done for ease of testing of virutual halt, break
-    if (type_of_instruction=='B'):
-        if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
-          stop=1  
-          break #comment out 103,104 for testing
-        rs1=line_to_execute[7:12]
-        rs2=line_to_execute[12:17]
-        funct3=line_to_execute[17:20]
-        immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
-        offset=BtoD(immediate)
-        #beq
-        if (funct3=="000" and registers[rs1]==registers[rs2]):
-            program_counter+=offset
-        #bne
-        elif (funct3=="001" and registers[rs1]!=registers[rs2]):
-            program_counter+=offset
-        #blt
-        elif (funct3=="100" and registers[rs1]<registers[rs2]):
-            program_counter+=offset
-        #bge
-        elif (funct3=="101" and registers[rs1]>=registers[rs2]):
-            program_counter+=offset
-        #bltu
-        elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
-            program_counter+=offset
-        #bgeu
-        elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
-            program_counter+=offset
+#copy paste line till line 130 to B-Type instruction condition
+if (type_of_instruction=='B'):
+    if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
+        stop=1
+    rs1=line_to_execute[7:12]
+    rs2=line_to_execute[12:17]
+    funct3=line_to_execute[17:20]
+    immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
+    offset=BtoD(immediate)
+    #beq
+    if (funct3=="000" and registers[rs1]==registers[rs2]):
+        program_counter+=offset
+    #bne
+    elif (funct3=="001" and registers[rs1]!=registers[rs2]):
+        program_counter+=offset
+    #blt
+    elif (funct3=="100" and registers[rs1]<registers[rs2]):
+        program_counter+=offset
+    #bge
+    elif (funct3=="101" and registers[rs1]>=registers[rs2]):
+        program_counter+=offset
+    #bltu
+    elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
+        program_counter+=offset
+    #bgeu
+    elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
+        program_counter+=offset
 
 #copy paste till eof to S-Type instruction condition
 if (type_of_instruction=='S'):
@@ -143,5 +141,3 @@ if (type_of_instruction=='S'):
         print("Error, memory address is not a multiple of 4")
     mem='0x000100'+Hex
     memory[mem]=registers[sp]
-
-    
