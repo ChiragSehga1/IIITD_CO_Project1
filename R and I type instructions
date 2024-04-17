@@ -1,3 +1,44 @@
+global program_counter
+program_counter= 0
+
+global updated
+updated = 0
+
+global memory
+memory = {"0x00010000" : 0,
+          "0x00010004" : 0,
+          "0x00010008" : 0, 
+          "0x0001000c" : 0,
+          "0x00010010" : 0,
+          "0x00010014" : 0,
+          "0x00010018" : 0, 
+          "0x0001001c" : 0,
+          "0x00010020" : 0,
+          "0x00010024" : 0,
+          "0x00010028" : 0, 
+          "0x0001002c" : 0,
+          "0x00010030" : 0,
+          "0x00010034" : 0,
+          "0x00010038" : 0, 
+          "0x0001003c" : 0,
+          "0x00010040" : 0,
+          "0x00010044" : 0,
+          "0x00010048" : 0, 
+          "0x0001004c" : 0,
+          "0x00010050" : 0,
+          "0x00010054" : 0,
+          "0x00010058" : 0, 
+          "0x0001005c" : 0,
+          "0x00010060" : 0,
+          "0x00010064" : 0,
+          "0x00010068" : 0, 
+          "0x0001006c" : 0,
+          "0x00010070" : 0,
+          "0x00010074" : 0,
+          "0x00010078" : 0, 
+          "0x0001007c" : 0 }
+
+
 def twoscompliment(num, n = 32):
     if num >= 0:
         a = ""
@@ -17,6 +58,15 @@ def twoscompliment(num, n = 32):
         a = str(int(n*"1") - int(a))
         a = (n - len(a))*"0" + a
         return a            
+
+def DtoH(decimal):
+    #takes an integer in decimal and returns a converted string in hexadecimal
+    hex=''
+    rem={0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'a',11:'b',12:'c',13:'d',14:'e',15:'f'}
+    while(decimal>0):
+        hex+=rem[decimal%16]
+        decimal=decimal//16
+    return hex[-1:0:-1]+hex[0]
 
 
 def unsigned(num,n=32):
@@ -74,7 +124,7 @@ def R(line):
     elif func3 == '000':
         registers[rsd] = registers[rs1] + registers[rs2]#add
     elif func3 == '001':#left shift
-        registers[rsd] = bin_to_int((twoscompliment(registers[rs1]) + bin_to_int(((unsigned(registers[rs2]))[-5::]))*('0'))[5::],'s')
+        registers[rsd] = bin_to_int((twoscompliment(registers[rs1]) + bin_to_int(((twoscompliment(registers[rs2]))[-5::]))*('0'))[5::],'s')
     elif func3 == '010':
         if registers[rs1] < registers[rs2]:#slt
             register[rsd] = 1
@@ -86,7 +136,7 @@ def R(line):
         else:
             register[rsd] = 0
     elif func3 == '101':#right shift
-        registers[rsd] = bin_to_int((bin_to_int((unsigned(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
+        registers[rsd] = bin_to_int((bin_to_int((twoscompliment(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
     elif func3 == '110':#or
         registers[rsd] = registers[rs1] | registers[rs2]
     elif func3 == '111':#and
@@ -99,7 +149,8 @@ def I(line):
     rs1 = line[-20:-15]
     imm = line[0:12]
     if opcode == '0000011':#lw
-        registers[rsd] = memory[registers[rs1] + bin_to_int(imm,'s')]
+        Hex= '0x000100' + DtoH(registers[rs1] + bin_to_int(imm,'s'))
+        registers[rsd] = memory[Hex]
     elif opcode == '0010011':
         if func3 == '000':#addi
             registers[rsd] = registers[rs1] + bin_to_int(imm,'s')
