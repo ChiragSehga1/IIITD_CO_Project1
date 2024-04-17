@@ -165,5 +165,5 @@ if (type_of_instruction=='S'):
         print("Error, memory address",int(registers[ra])+imm,"invalid")
     else:
         Hex=DtoH(registers[ra]+imm)
-        mem='0x000100'+Hex
-        memory[mem]=registers[sp]
+        mem='0x000' + Hex
+        memory[mem]=registers[ra]
