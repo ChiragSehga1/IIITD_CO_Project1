@@ -1,32 +1,3 @@
-#assumed "halt" in machine code is "00000000000000000000000000000000"
-#assumed "rst" in machine code is "10000000000000000000000000000000"
-#assumed "rvrs rd,rs" in machine code is "000000000000[rs1]111[rd]0000000"
-#assumed "mul rd,rs1,rs2" in machine code is "1000000[rs2][rs1]111[rd]0000000"
-
-#sample code = 
-"""
-0000000 rs2 rs1 000 rd 0110011 : add rd, rs1, rs2
-0000000 rs2 rs1 110 rd 0110011 : or rd, rs1, rs2
-imm[11 : 0] rs1 010 rd 0000011 : lw rd, imm[11:0](rs1)
-imm[12|10 : 5] rs2 rs1 000 imm[4 : 1|11] 1100011 :  beq rs1, rs2, imm[12:1]
-a1 = 01011
-a2 = 01100
-a7 = 10001
-53 = 110101
-
-converts to: 
-add a7, a1, a2
-or a7, a1, a2
-lw a7, 53(a2)
-
-0000000 01100 01011 000 10001 0110011
-0000000 01100 01011 110 10001 0110011
- 000000110101 01100 010 10001 0000011
-0000000 00000 00000 000 00000 1100011
- 
-This is the sample I will write the requirments in
-"""
-
 import sys
 
 def readFile(x):
@@ -35,6 +6,11 @@ def readFile(x):
     binary = file.readlines()
     for i in range (len(binary)):
         binary[i] = binary[i].strip("\n")
+    temp = binary
+    binary = []
+    for i in temp:
+        if i != "":
+            binary = binary + [i]
     dictionary = {}
     for i in range(0,len(binary)):
         line = binary[i]
@@ -52,15 +28,58 @@ def readFile(x):
             inst_type = 'U'
         elif opcode == '1101111':
             inst_type = 'J'
+        elif opcode == '0000000':
+            inst_type = 'bonus'
         dictionary[i*4] = [line,inst_type]
 
     return dictionary
 
+def DtoH(decimal):
+    #takes an integer in decimal and returns a converted string in hexadecimal
+    hex=''
+    rem={0:'0',1:'1',2:'2',3:'3',4:'4',5:'5',6:'6',7:'7',8:'8',9:'9',10:'a',11:'b',12:'c',13:'d',14:'e',15:'f'}
+    while(decimal>0):
+        hex+=rem[decimal%16]
+        decimal=decimal//16
+    return hex[-1:0:-1]+hex[0]
 
-
-#JASJYOT
-# program stub to convert binary to decimal which takes 2 arguments, number of bits<int> 
-# and the number <str> and returns a decimal number<int>
+def BtoD(binary):
+    #takes a binary in string and returns a converted integer in decimal
+    dec=0
+    for i in range(0,len(binary)):
+        dec=dec+int(binary[-(i+1)])*(2**(i))
+    return dec
+'''
+def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
+    sign = 1 #remembers if binary is positive
+    if (y == 's'):
+        if len(x) < 32: #sign extends signed binary
+            x = x[0]*(32-len(x)) + x
+        x = list(x)
+        if x[0] == '1': #converts negative binary to twos complement positive number
+            sign = -1
+            for i in range(32):#bit flip
+                if x[i] == '0':
+                    x[i] = '1'
+                else:
+                    x[i] = '0'
+            if x[-1] == '0':#plus 1
+                x[-1] = '1'
+            else:
+                i = 31
+                while (x[i] == '1'):
+                    x[i] = '0'
+                    i -= 1
+                x[i] = '1'
+    else:#converts unsigned binary to twos compliment
+        x = '0'*(32-len(x)) + x
+        list(x)
+    out = 0
+    for i in range(32): #converts binary to integer
+        if x[i] == '1':
+            out += 1*2**(31-i)
+    out *= sign #turns int negative if binary is negative
+    return out'''
 
 def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
     sign = 1 #remembers if binary is positive
@@ -93,6 +112,35 @@ def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
     out *= sign #turns int negative if binary is negative
     return out
 
+def twoscompliment(num, n = 32):
+    if num >= 0:
+        a = ""
+        tempnum = num
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = (n - len(a))*"0" + a 
+        return a
+
+    else:
+        a = ""
+        tempnum = (num*(-1)) - 1
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = str(int(n*"1") - int(a))
+        a = (n - len(a))*"0" + a
+        return a            
+
+
+def unsigned(num,n=32):
+    a = ""
+    tempnum = num
+    while tempnum != 0:
+        a = str(tempnum % 2) + a
+        tempnum = tempnum // 2
+    a = (n - len(a))*"0" + a 
+    return a
 
 global registers
 registers = { "00000" : 0 ,
@@ -166,10 +214,13 @@ memory = {"0x00010000" : 0,
  
 global program_counter
 program_counter= 0
+
 global stop
 stop = 0
+
 global updated
 updated = 0
+
 
 def bonus_type(line_to_execute):
     if (line_to_execute == "00000000000000000000000000000000"):
@@ -191,24 +242,160 @@ def bonus_type(line_to_execute):
         #multiple first and second (ignore overflow) and store in third
         pass # <=====================================================================================
 
-while stop == 0:
+def Utype(x):
+    imm=x[0:20] #loading top 20 bits of immediate value
+    rd=x[20:25] #loading register value
+    opcode=x[25:]#loading opcode
+    upperimmvalue=imm+12*"0"#computing upperimmediate value
+    value = bin_to_int(upperimmvalue,"s")#converting to integer
+    if opcode=="0110111":#lui
+        registers[rd]=value
+    if opcode=="0010111":#auipc 
+        registers[rd]=program_counter+value
+        
+def Jtype(x):
+    rd=x[20:25]
+    opcode=x[25:]
+    imm=x[0]+x[12:20]+x[11]+x[1:11]#reading the immediate value with correct syntax
+    registers[rd]=program_counter+4#storing return address in register
+    b10=imm+"0"
+    b10=bin_to_int(b10,"s")
+    program_counter+=b10
+    
+def Btype(linetoexecute):
+    if(line_to_execute=="00000000000000000000000001100011"):#check for virtual halt
+        stop=1
+    rs1=line_to_execute[7:12]
+    rs2=line_to_execute[12:17]
+    funct3=line_to_execute[17:20]
+    immediate=line_to_execute[0]+line_to_execute[24]+line_to_execute[1:7]+line_to_execute[20:24]+'0'
+    offset=BtoD(immediate)
+    #beq
+    if (funct3=="000" and registers[rs1]==registers[rs2]):
+        program_counter+=offset
+    #bne
+    elif (funct3=="001" and registers[rs1]!=registers[rs2]):
+        program_counter+=offset
+    #blt
+    elif (funct3=="100" and registers[rs1]<registers[rs2]):
+        program_counter+=offset
+    #bge
+    elif (funct3=="101" and registers[rs1]>=registers[rs2]):
+        program_counter+=offset
+    #bltu
+    elif (funct3=="110" and abs(registers[rs1])<abs(registers[rs2])):
+        program_counter+=offset
+    #bgeu
+    elif (funct3=="111" and abs(registers[rs1])>=abs(registers[rs2])):
+        program_counter+=offset
+
+def Stype(line_to_execute):
+    immediate=line_to_execute[0:7]+line_to_execute[20:25]
+    ra=line_to_execute[7:12] #r1
+    sp=line_to_execute[12:17] #r2
+    funct3=line_to_execute[17:20]
+    imm=BtoD(immediate)
+    Hex=DtoH(registers[ra]+imm)
+    if((int(registers[ra])+imm)%4!=0):
+        print("Error, memory address is not a multiple of 4")
+    mem='0x000100'+Hex
+    memory[mem]=registers[sp]
+    
+def Rtype(line):
+    rsd = line[-12:-7]
+    rs1 = line[-20:-15]
+    rs2 = line[-25:-20]
+    func7 = line[0:7]
+    func3 = line[-15:-12]
+    if func7 == '0100000':
+        registers[rsd] = registers[rs1] - registers[rs2]#sub
+    elif func3 == '000':
+        registers[rsd] = registers[rs1] + registers[rs2]#add
+    elif func3 == '001':#left shift
+        rs1 = twoscompliment(registers[rs1])
+        rs2 = twoscompliment(registers[rs2])[-5::]
+        shift = bin_to_int(rs2) * '0'
+        new = (rs1 + shift)[-32::]
+        registers[rsd] = bin_to_int(new,'s')
+    elif func3 == '010':
+        if registers[rs1] < registers[rs2]:#slt
+            register[rsd] = 1
+        else:
+            register[rsd] = 0
+    elif func3 == '011':
+        if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(twoscompliment(registers[rs2])):#sltu
+            register[rsd] = 1
+        else:
+            register[rsd] = 0
+    elif func3 == '101':#right shift
+        registers[rsd] = bin_to_int((bin_to_int((twoscompliment(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
+    elif func3 == '110':#or
+        registers[rsd] = registers[rs1] | registers[rs2]
+    elif func3 == '111':#and
+        registers[rsd] = registers[rs1] & registers[rs2]
+
+
+def Itype(line):
+    
+    opcode = line[-7::]
+    rsd = line[-12:-7]
+    func3 = line[-15:-12]
+    rs1 = line[-20:-15]
+    imm = line[0:12]
+    
+    if opcode == '0000011':#lw
+        Hex= '0x000100' + DtoH(registers[rs1] + bin_to_int(imm,'s'))
+        registers[rsd] = memory[Hex]
+        
+    elif opcode == '0010011':
+        if func3 == '000':#addi
+            registers[rsd] = registers[rs1] + bin_to_int(imm,'s')
+            
+        else:#sltiu
+            if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(imm):
+                registers[rsd] = 1
+            else:
+                register[rsd] = 0
+    elif opcode == '1100111':#jalr
+        registers[rd] = program_counter + 4
+        temp = registers[rs1] + bin_to_int(imm)#
+        if temp % 2 != 0:#temp exists because in the cornell simulator, program counter just needs to be even for jalr instructions but if program_counter isn't divisible by 4 then it doesn't jump
+            temp -= 1
+        if temp % 4 == 0:
+            program_counter = temp
+            updated = 1
+    
+code = readFile("trial.txt")
+
+    
+while stop == 0 :
     line_to_execute = code[program_counter][0]
     type_of_intruction = code[program_counter][1]
 
     if type_of_intruction == "R":#AKSHAT
-        pass # <=====================================================================================
-    if type_of_intruction == "I":#AKSHAT
-        pass # <=====================================================================================
-    if type_of_intruction == "S":#CHIRAG
-        pass # <=====================================================================================
-    if type_of_intruction == "B":#(needs to break loop if "00000000000000000000000001100011" found) #CHIRAG
-        pass # <=====================================================================================
-    if type_of_intruction == "U":#JASJYOT
-        pass # <=====================================================================================
-    if type_of_intruction == "J":#JASJYOT
-        pass # <=====================================================================================
-    if type_of_intruction == "bonus":
+        Rtype(line_to_execute)
+    
+    elif type_of_intruction == "I":#AKSHAT
+        Itype(line_to_execute)
+    elif type_of_intruction == "S":#CHIRAG
+        Stype(line_to_execute)
+    elif type_of_intruction == "B":#CHIRAG
+        Btype(line_to_execute)
+    elif type_of_intruction == "U":#JASJYOT
+        Utype(line_to_execute)
+    elif type_of_intruction == "J":#JASJYOT
+        Jtype(line_to_execute)
+    elif type_of_intruction == "bonus":
         bonus_type(line_to_execute)
-
-### ALL CODES ABOVE ARE ON SWITCH-CASE BASIS. THEY NEED TO EDIT THE PROGRAM COUNTER AND REGISTERS INTERNALLY.
-### If virtual halt ("B" type) or halt ("bonus" type) are found, we need to change the global variable stop and exit loop
+    if updated == 1:
+        updated = 0
+        print(program_counter)
+        for i in registers:
+            print (i , " : " , registers[i])
+            pass
+        continue
+    print(program_counter)
+    for i in registers:
+        print (i , " : " , registers[i])
+        pass
+    program_counter += 4
