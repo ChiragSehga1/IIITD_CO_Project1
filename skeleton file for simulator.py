@@ -314,14 +314,14 @@ def Rtype(line):
         registers[rsd] = bin_to_int(new,'s')
     elif func3 == '010':
         if registers[rs1] < registers[rs2]:#slt
-            register[rsd] = 1
+            registers[rsd] = 1
         else:
-            register[rsd] = 0
+            registers[rsd] = 0
     elif func3 == '011':
         if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(twoscompliment(registers[rs2])):#sltu
-            register[rsd] = 1
+            registers[rsd] = 1
         else:
-            register[rsd] = 0
+            registers[rsd] = 0
     elif func3 == '101':#right shift
         registers[rsd] = bin_to_int((bin_to_int((twoscompliment(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
     elif func3 == '110':#or
