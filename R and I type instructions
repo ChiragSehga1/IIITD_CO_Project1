@@ -19,7 +19,7 @@ def twoscompliment(num, n = 32):
         return a            
 
 
-def unsigned(num):
+def unsigned(num,n=32):
     a = ""
     tempnum = num
     while tempnum != 0:
