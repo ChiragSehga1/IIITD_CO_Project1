@@ -47,7 +47,7 @@ def Jtype(x):
     imm=x[0]+x[12:20]+x[11]+x[1:11]#reading the immediate value with correct syntax
     registers[rd]=program_counter+4#storing return address in register
     b10=imm+"0"
-    b10=bin_to_int(b10,s)
+    b10=bin_to_int(b10,'s')
     program_counter+=b10
     program_counter=program_counter//4
     
