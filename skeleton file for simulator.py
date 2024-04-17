@@ -313,7 +313,7 @@ def Itype(line):
     imm = line[0:12]
     
     if opcode == '0000011':#lw
-        Hex= '0x000100' + DtoH(registers[rs1] + bin_to_int(imm,'s'))
+        Hex= '0x000' + DtoH(registers[rs1] + bin_to_int(imm,'s'))
         registers[rsd] = memory[Hex]
         
     elif opcode == '0010011':
