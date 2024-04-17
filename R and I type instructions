@@ -74,7 +74,7 @@ def R(line):
     elif func3 == '000':
         registers[rsd] = registers[rs1] + registers[rs2]#add
     elif func3 == '001':#left shift
-        registers[rsd] = bin_to_int((twoscompliment(registers[rs1]) + (unsigned(registers[rs2])[-5::])*('0'))[5::],'s')
+        registers[rsd] = bin_to_int((twoscompliment(registers[rs1]) + bin_to_int(((unsigned(registers[rs2]))[-5::]))*('0'))[5::],'s')
     elif func3 == '010':
         if registers[rs1] < registers[rs2]:#slt
             register[rsd] = 1
@@ -86,7 +86,7 @@ def R(line):
         else:
             register[rsd] = 0
     elif func3 == '101':#right shift
-        registers[rsd] = bin_to_int(((unsigned(registers[rs2])[-5::])*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
+        registers[rsd] = bin_to_int((bin_to_int((unsigned(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
     elif func3 == '110':#or
         registers[rsd] = registers[rs1] | registers[rs2]
     elif func3 == '111':#and
