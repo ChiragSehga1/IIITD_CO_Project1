@@ -101,6 +101,26 @@ def twoscompliment(num, n = 32):
         a = (n - len(a))*"0" + a
         return a            
 
+def twoscompliment2(num, n = 32):
+    if num >= 0:
+        a = ""
+        tempnum = num
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = (n - len(a))*"0" + a 
+        return a
+
+    else:
+        a = ""
+        tempnum = (num*(-1)) - 1
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = str(int(n*"1") - int(a))
+        a = (n - len(a))*"0" + a
+        return "0b"+a            
+
 
 def unsigned(num,n=32):
     a = ""
