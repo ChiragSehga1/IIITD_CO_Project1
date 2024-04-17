@@ -352,7 +352,7 @@ def Itype(line):
             else:
                 register[rsd] = 0
     elif opcode == '1100111':#jalr
-        registers[rd] = program_counter[1] + 4
+        registers[rsd] = program_counter[1] + 4
         temp = registers[rs1] + bin_to_int(imm)#
         if temp % 2 != 0:#temp exists because in the cornell simulator, program counter just needs to be even for jalr instructions but if program_counter isn't divisible by 4 then it doesn't jump
             temp -= 1
