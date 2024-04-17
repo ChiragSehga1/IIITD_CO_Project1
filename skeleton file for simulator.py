@@ -49,37 +49,6 @@ def BtoD(binary):
     for i in range(0,len(binary)):
         dec=dec+int(binary[-(i+1)])*(2**(i))
     return dec
-'''
-def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
-    sign = 1 #remembers if binary is positive
-    if (y == 's'):
-        if len(x) < 32: #sign extends signed binary
-            x = x[0]*(32-len(x)) + x
-        x = list(x)
-        if x[0] == '1': #converts negative binary to twos complement positive number
-            sign = -1
-            for i in range(32):#bit flip
-                if x[i] == '0':
-                    x[i] = '1'
-                else:
-                    x[i] = '0'
-            if x[-1] == '0':#plus 1
-                x[-1] = '1'
-            else:
-                i = 31
-                while (x[i] == '1'):
-                    x[i] = '0'
-                    i -= 1
-                x[i] = '1'
-    else:#converts unsigned binary to twos compliment
-        x = '0'*(32-len(x)) + x
-        list(x)
-    out = 0
-    for i in range(32): #converts binary to integer
-        if x[i] == '1':
-            out += 1*2**(31-i)
-    out *= sign #turns int negative if binary is negative
-    return out'''
 
 def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
     sign = 1 #remembers if binary is positive
@@ -290,16 +259,16 @@ def Btype(linetoexecute):
         program_counter+=offset
 
 def Stype(line_to_execute):
-    immediate=line_to_execute[0:7]+line_to_execute[20:25]
+    immediate = line_to_execute[0:7]+line_to_execute[20:25]
     ra=line_to_execute[7:12] #r1
     sp=line_to_execute[12:17] #r2
     funct3=line_to_execute[17:20]
     imm=BtoD(immediate)
-    Hex=DtoH(registers[ra]+imm)
-    if((int(registers[ra])+imm)%4!=0):
+    Hex=DtoH(registers[sp]+imm)
+    if((int(registers[sp])+imm)%4!=0):
         print("Error, memory address is not a multiple of 4")
-    mem='0x000100'+Hex
-    memory[mem]=registers[sp]
+    mem='0x000' + Hex
+    memory[mem]=registers[ra]
     
 def Rtype(line):
     rsd = line[-12:-7]
