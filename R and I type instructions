@@ -97,7 +97,7 @@ def I(line):
     rsd = line[-12:-7]
     func3 = line[-15:-12]
     rs1 = line[-20:-15]
-    imm = line[0:11]
+    imm = line[0:12]
     if opcode == '0000011':#lw
         registers[rsd] = memory[registers[rs1] + bin_to_int(imm,'s')]
     elif opcode == '0010011':
