@@ -1,3 +1,68 @@
+def twoscompliment(num, n = 32):
+    if num >= 0:
+        a = ""
+        tempnum = num
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = (n - len(a))*"0" + a 
+        return a
+
+    else:
+        a = ""
+        tempnum = (num*(-1)) - 1
+        while tempnum != 0:
+            a = str(tempnum % 2) + a
+            tempnum = tempnum // 2
+        a = str(int(n*"1") - int(a))
+        a = (n - len(a))*"0" + a
+        return a            
+
+
+def unsigned(num):
+    a = ""
+    tempnum = num
+    while tempnum != 0:
+        a = str(tempnum % 2) + a
+        tempnum = tempnum // 2
+    a = (n - len(a))*"0" + a 
+    return a
+    
+
+
+def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
+    sign = 1 #remembers if binary is positive
+    if (y == 's'):
+        if len(x) < 32: #sign extends signed binary
+            x = x[0]*(32-len(x)) + x
+        x = list(x)
+        if x[0] == '1': #converts negative binary to twos complement positive number
+            sign = -1
+            for i in range(32):#bit flip
+                if x[i] == '0':
+                    x[i] = '1'
+                else:
+                    x[i] = '0'
+            if x[-1] == '0':#plus 1
+                x[-1] = '1'
+            else:
+                i = 31
+                while (x[i] == '1'):
+                    x[i] = '0'
+                    i -= 1
+                x[i] = '1'
+    else:#converts unsigned binary to twos compliment
+        x = '0'*(32-len(x)) + x
+        list(x)
+    out = 0
+    for i in range(32): #converts binary to integer
+        if x[i] == '1':
+            out += 1*2**(31-i)
+    print(sign)
+    out *= sign #turns int negative if binary is negative
+    return out
+
+        
 def R(line):
     rsd = line[-12:-7]
     rs1 = line[-20:-15]
@@ -5,28 +70,26 @@ def R(line):
     func7 = line[0:7]
     func3 = line[-15:-12]
     if func7 == '0100000':
-        registers[rsd] = twoscompliment(bin_to_int(registers[rs1],'s') - bin_to_int(registers[rs2],'s'))#sub
+        registers[rsd] = registers[rs1] - registers[rs2]#sub
     elif func3 == '000':
-        registers[rsd] = twoscompliment(bin_to_int(registers[rs1],'s') + bin_to_int(registers[rs2],'s'))#add
+        registers[rsd] = registers[rs1] + registers[rs2]#add
     elif func3 == '001':#left shift
-        registers[rsd] = registers[rs2][-5::] + registers[rs1][5::] 
+        registers[rsd] = bin_to_int((twoscompliment(registers[rs1]) + unsigned(registers[rs2][-5::])*('0'))[5::],'s')
     elif func3 == '010':
-        if bin_to_int(registers[rs1],'s') < bin_to_int(registers[rs1],'s'):#slt
+        if registers[rs1] < registers[rs2]:#slt
             register[rsd] = 1
         else:
             register[rsd] = 0
     elif func3 == '011':
-        if bin_to_int(registers[rs1]) < bin_to_int(registers[rs1]):#sltu
+        if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(twoscompliment(registers[rs2])):#sltu
             register[rsd] = 1
         else:
             register[rsd] = 0
-    elif func3 == '100': #xor
-        registers[rsd] = registers[rs1] ^ registers[rs2]
     elif func3 == '101':#right shift
-        registers[rsd] = registers[rs1][0:-5] + register[rs2][-5::]
+        registers[rsd] = bin_to_int(unsigned(registers[rs2][-5::])*('0') + (twoscompliment(registers[rs1]))[0:-5],'s')
     elif func3 == '110':#or
         registers[rsd] = registers[rs1] | registers[rs2]
-    elif func3 == '111':#or
+    elif func3 == '111':#and
         registers[rsd] = registers[rs1] & registers[rs2]
 
 def I(line):
@@ -36,18 +99,18 @@ def I(line):
     rs1 = line[-20:-15]
     imm = line[0:11]
     if opcode == '0000011':#lw
-        registers[rsd] = memory[bin_to_int(rs1,'s') + bin_to_int(imm,'s')]
+        registers[rsd] = memory[registers[rs1] + bin_to_int(imm,'s')]
     elif opcode == '0010011':
         if func3 == '000':#addi
-            registers[rsd] = bin_to_int(registers[rs1],'s') + bin_to_int(imm,'s')
+            registers[rsd] = registers[rs1] + bin_to_int(imm,'s')
         else:#sltiu
-            if bin_to_int(registers[rs1]) < bin_to_int(imm):
+            if registers[rs1] < bin_to_int(imm):
                 registers[rsd] = 1
             else:
                 register[rsd] = 0
     elif opcode == '1100111':#jalr
         registers[rd] = program_counter + 4
-        temp = bin_to_int(registers[rs1]) + bin_to_int(imm)#
+        temp = registers[rs1] + bin_to_int(imm)#
         if temp % 2 != 0:#temp exists because in the cornell simulator, program counter just needs to be even for jalr instructions but if program_counter isn't divisible by 4 then it doesn't jump
             temp -= 1
         if temp % 4 == 0:
