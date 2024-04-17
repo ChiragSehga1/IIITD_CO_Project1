@@ -1,7 +1,7 @@
 global registers
 registers = { "00000" : 0 ,
-              "00001" : 9  ,
-              "00010" : 7 ,
+              "00001" : 7 ,
+              "00010" : 4 ,
               "00011" : 0  , 
               "00100" : 0  ,
               "00101" : 0  ,
@@ -76,7 +76,6 @@ stop = 0
 """copy paste lines 81 to 96 to general function definitions 
 If conflicted
 DtoH is called in line 130 only (and in Akshat's code)
-BtoD is called in lines 106 and 131
 """
 
 def bin_to_int(x,y = 'u'):#x=binary | y = s or u (signed or unsigned)
@@ -119,17 +118,10 @@ def DtoH(decimal):
         decimal=decimal//16
     return hex[-1:0:-1]+hex[0]
 
-def BtoD(binary):
-    #takes a binary in string and returns a converted integer in decimal
-    dec=0
-    for i in range(0,len(binary)):
-        dec=dec+int(binary[-(i+1)])*(2**(i))
-    return dec
 
 
-
-type_of_instruction='B'
-line_to_execute="11110010111101101100110011100011"
+type_of_instruction='S'
+line_to_execute="11111110000100010010000000100011"
 """
 I know this would've been better in a function but my global seems 
 to stop working when used inside of a function, so yeah
@@ -165,12 +157,13 @@ if (type_of_instruction=='B'):
 #copy paste till eof to S-Type instruction condition
 if (type_of_instruction=='S'):
     immediate=line_to_execute[0:7]+line_to_execute[20:25]
-    ra=line_to_execute[7:12] #r1
-    sp=line_to_execute[12:17] #r2
+    sp=line_to_execute[7:12] #rs2
+    ra=line_to_execute[12:17] #rs1
     funct3=line_to_execute[17:20]
-    imm=BtoD(immediate)
-    Hex=DtoH(registers[ra]+imm)
-    if((int(registers[ra])+imm)%4!=0):
-        print("Error, memory address is not a multiple of 4")
-    mem='0x000100'+Hex
-    memory[mem]=registers[sp]
+    imm=bin_to_int(immediate,'s')
+    if((int(registers[ra])+imm)%4!=0 or (int(registers[ra])+imm)<0):
+        print("Error, memory address",int(registers[ra])+imm,"invalid")
+    else:
+        Hex=DtoH(registers[ra]+imm)
+        mem='0x000100'+Hex
+        memory[mem]=registers[sp]
