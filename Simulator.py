@@ -30,7 +30,8 @@ def readFile(x):
             inst_type = 'J'
         elif opcode == '0000000':
             inst_type = 'bonus'
-        dictionary[(i+1)*4] = [line,inst_type]
+        dictionary[(i)*4] = [line,inst_type]
+    file.close()
 
     return dictionary
 
@@ -201,7 +202,7 @@ memory = {"0x00010000" : 0,
           "0x0001007c" : 0 }
  
 global program_counter
-program_counter = {1 : 4}
+program_counter = {1 : 0}
 
 global stop
 stop = {1 : 0}
@@ -312,14 +313,14 @@ def Rtype(line):
         registers[rsd] = bin_to_int(new,'s')
     elif func3 == '010':
         if registers[rs1] < registers[rs2]:#slt
-            register[rsd] = 1
+            registers[rsd] = 1
         else:
-            register[rsd] = 0
+            registers[rsd] = 0
     elif func3 == '011':
         if bin_to_int(twoscompliment(registers[rs1])) < bin_to_int(twoscompliment(registers[rs2])):#sltu
-            register[rsd] = 1
+            registers[rsd] = 1
         else:
-            register[rsd] = 0
+            registers[rsd] = 0
     elif func3 == '101':#right shift
         registers[rsd] = bin_to_int((bin_to_int((twoscompliment(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
     elif func3 == '110':#or
@@ -358,9 +359,11 @@ def Itype(line):
             program_counter[1] = temp
             updated[1] = 1
 
-            
+#output_file = "C:/Users/Dhruv/Desktop/proof.txt"           
 input_file = str(sys.argv[1])
+#input_file = "C:/Users/Dhruv/Desktop/CO Project evaluation framework Apr2/automatedTesting/tests/bin/simple/s_test1.txt"
 output_file = str(sys.argv[2])
+
 
 writer = open(output_file , 'w')
 
@@ -371,6 +374,9 @@ code = readFile(input_file)
 while (stop[1] == 0) and (program_counter[1] in code) :
     line_to_execute = code[program_counter[1]][0]
     type_of_intruction = code[program_counter[1]][1]
+    
+    if line_to_execute == "00000000000000000000000001100011":
+        break
 
     if type_of_intruction == "R":#AKSHAT
         Rtype(line_to_execute)
@@ -386,6 +392,7 @@ while (stop[1] == 0) and (program_counter[1] in code) :
         Jtype(line_to_execute)
     elif type_of_intruction == "bonus":
         bonus_type(line_to_execute)
+    program_counter[1] += 4
     if stop[1] == 1:
         break
     if updated[1] == 1:
@@ -400,7 +407,7 @@ while (stop[1] == 0) and (program_counter[1] in code) :
     for i in registers:
         writer.write(str(twoscompliment2(registers[i])) + " ")
     writer.write("\n")
-    program_counter[1] += 4
+    
 
 writer.write(str(twoscompliment2(program_counter[1])) + " ")
 for i in registers:
@@ -409,3 +416,6 @@ writer.write("\n")
     
 for keys in memory:
     writer.write(keys+':'+twoscompliment2(memory[keys]) + "\n")
+
+writer.close()
+
