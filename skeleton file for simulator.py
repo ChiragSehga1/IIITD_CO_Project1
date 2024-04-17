@@ -210,6 +210,10 @@ stop = {1 : 0}
 global updated
 updated = {1 : 0}
 
+def data_mem_output():
+    for keys in memory:
+        print(keys+':'+twoscompliment2(a[keys]))
+
 
 def bonus_type(line_to_execute):
     if (line_to_execute == "00000000000000000000000000000000"):
