@@ -390,8 +390,10 @@ writer = open(output_file , 'w')
 
 code = readFile(input_file)
 
+count = 0
     
-while (stop[1] == 0) and (program_counter[1] in code) :
+while (stop[1] == 0) and (program_counter[1] in code) and (count <100000000)  :
+    count += 1
     line_to_execute = code[program_counter[1]][0]
     type_of_intruction = code[program_counter[1]][1]
     
