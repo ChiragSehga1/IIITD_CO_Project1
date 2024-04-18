@@ -416,6 +416,7 @@ while (stop[1] == 0) and (program_counter[1] in code) :
     if stop[1] == 1:
         break
     if updated[1] == 1:
+        program_counter[1] -= 4
         updated[1] = 0
         print(twoscompliment2(program_counter[1]) , end = " ")
         writer.write(str(twoscompliment2(program_counter[1])) + " ")
