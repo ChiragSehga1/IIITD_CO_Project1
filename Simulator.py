@@ -240,12 +240,18 @@ def bonus_type(line_to_execute):
         first = line_to_execute[12:17]
         second = line_to_execute[20:25]
         #reverse first and store in second
-        pass # <=====================================================================================
+        first = (twoscompliment(registers[first]))[::-1]
+        registers[second] = bin_to_int(first , 's')
+        
     if (line_to_execute[0] == "1" and line_to_execute[17:20] == "111"):
         first = line_to_execute[7:12]
         second = line_to_execute[12:17]
         third = line_to_execute[20:25]
-        #multiply first and second (ignore overflow) and store in third     
+        #multiply first and second (ignore overflow) and store in third
+        ans = registers[first] * registers[second]
+        ans = twoscompliment(ans)
+        ans = ans[-32:]
+        registers[third] = bin_to_int(ans , 's')     
 
 def Utype(x):
     imm = x[0:20] #loading top 20 bits of immediate value
