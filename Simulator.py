@@ -89,17 +89,24 @@ def twoscompliment(num, n = 32):
         while tempnum != 0:
             a = str(tempnum % 2) + a
             tempnum = tempnum // 2
+        if len(a)>32:
+            a = a[-33::]
+            return a
         a = (n - len(a))*"0" + a 
         return a
-
+    elif num == -1:
+        a = '1'*32
+        return a
     else:
         a = ""
         tempnum = (num*(-1)) - 1
         while tempnum != 0:
             a = str(tempnum % 2) + a
             tempnum = tempnum // 2
+        if len(a)>32:
+            a = a[-33::]
+            return a
         a = str(int(n*"1") - int(a))
-        a = (n - len(a))*"0" + a
         return a            
 
 def twoscompliment2(num, n = 32):
@@ -109,17 +116,24 @@ def twoscompliment2(num, n = 32):
         while tempnum != 0:
             a = str(tempnum % 2) + a
             tempnum = tempnum // 2
+        if len(a)>32:
+            a = a[-33::]
+            return "0b"+a
         a = (n - len(a))*"0" + a 
         return "0b"+a
-
+    elif num == -1:
+        a = '1'*32
+        return a
     else:
         a = ""
         tempnum = (num*(-1)) - 1
         while tempnum != 0:
             a = str(tempnum % 2) + a
             tempnum = tempnum // 2
+        if len(a)>32:
+            a = a[-33::]
+            return "0b"+a
         a = str(int(n*"1") - int(a))
-        a = (n - len(a))*"0" + a
         return "0b"+a  
 
 def unsigned(num,n=32):
@@ -301,9 +315,9 @@ def Rtype(line):
     func7 = line[0:7]
     func3 = line[-15:-12]
     if func7 == '0100000':
-        registers[rsd] = registers[rs1] - registers[rs2]#sub
+        registers[rsd] = bin_to_int(twoscompliment(registers[rs1] - registers[rs2]),'s')#sub
     elif func3 == '000':
-        registers[rsd] = registers[rs1] + registers[rs2]#add
+        registers[rsd] = bin_to_int(twoscompliment(registers[rs1] + registers[rs2]),'s')#add
     elif func3 == '001':#left shift
         rs1 = twoscompliment(registers[rs1])
         rs2 = twoscompliment(registers[rs2])[-5::]
@@ -320,6 +334,8 @@ def Rtype(line):
             registers[rsd] = 1
         else:
             registers[rsd] = 0
+    elif func3 == '100':#xor
+        registers[rsd] = registers[rs1] ^ registers[rs2]
     elif func3 == '101':#right shift
         registers[rsd] = bin_to_int((bin_to_int((twoscompliment(registers[rs2])[-5::]))*('0') + (twoscompliment(registers[rs1])))[0:-5],'s')
     elif func3 == '110':#or
